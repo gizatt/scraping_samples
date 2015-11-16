@@ -17,28 +17,31 @@ class AllrecipesSpider(CrawlSpider):
 
     def parse_item(self, response):
         i = RecipesItem()
-        i['name'] = response.xpath('//h1[@id="itemTitle"]/text()').extract_first()
-        i['author'] = response.xpath('//*[@id="lblSubmitter"]/a/text()').extract_first()
-        i['servings'] = response.xpath('//*[@id="lblYield"]/text()').re_first(r'(.*) servings')
+        i['name'] = response.xpath('//h1[@class="recipe-summary__h1"]/text()').extract_first()
+        i['author'] = response.xpath('//span[@class="submitter__name"]/text()').extract_first()
+        i['servings'] = int(response.xpath('//meta[@itemprop="recipeYield"]/@content').extract_first())
         
-        columns = response.xpath('//ul[contains(@class,"ingredient-wrap")]')
-        ingredients_all = {}
+        columns = response.xpath('//ul[contains(@id, "lst_ingredients")]')
+        ingredients_all = []
         for column in columns:
-            ingredients = column.xpath('./li[@id="liIngredient"]')
+            ingredients = column.xpath('./li[@class="checkList__line"]')
             for ingredient in ingredients:
-                ingredients_all[ingredient.xpath('.//span[@id="lblIngName"]/text()').extract_first()] = \
-                    ingredient.xpath('.//span[@id="lblIngAmount"]/text()').extract_first()
+                ingred = ingredient.xpath('.//span[@itemprop="ingredients" and contains(@class, "recipe-ingred_txt")]/text()').extract_first()
+                if ingred:
+                    ingredients_all.append(ingred)
 
         i['ingredients'] = ingredients_all
 
-        directions = response.xpath('//div[@class="directions"]//li/span')
+        directions = response.xpath('//ol[@class="list-numbers recipe-directions__list"]//li/span')
         directions_all = {}
         for index, direction in enumerate(directions):
             directions_all[index] = direction.xpath('./text()').extract_first()
 
         i['directions'] = directions_all
-        i['rating'] = response.xpath('(//*[@itemProp="ratingValue"]/@content)[1]').extract_first()
-        i['principal_image'] = response.xpath('//*[@id="imgPhoto"]/@src').extract_first()
+        i['rating'] = float(response.xpath('//div[contains(@class,"rating-stars")]/@data-ratingstars').extract_first())
+
+        i['ratings'] = int(response.xpath('//span[@class="review-count"]/text()').extract_first())
+
         i['url'] = response.url
 
         return i

@@ -16,7 +16,7 @@ NEWSPIDER_MODULE = 'recipes.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'recipes (+http://www.allrecipes.com)'
+USER_AGENT = 'recipes (+http://www.allrecipes.com) gizatt@mit.edu'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS=32
@@ -24,7 +24,7 @@ USER_AGENT = 'recipes (+http://www.allrecipes.com)'
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY=3
+DOWNLOAD_DELAY=0.1
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN=16
 #CONCURRENT_REQUESTS_PER_IP=16
