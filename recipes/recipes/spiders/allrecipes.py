@@ -12,14 +12,18 @@ class AllrecipesSpider(CrawlSpider):
     start_urls = ['http://www.allrecipes.com/']
 
     rules = (   
-        Rule(LinkExtractor(allow=(r'/Recipe/', r'/recipe/'), deny=(r'\?sitepref\=m')), callback='parse_item', follow=True),
+        Rule(LinkExtractor(allow=(r'/Recipe/', r'/recipe/'), deny=(r'\?sitepref\=m', r'/reviews/', r'/Reviews/', r'/print/')), callback='parse_item', follow=True),
     )
 
     def parse_item(self, response):
         i = RecipesItem()
         i['name'] = response.xpath('//h1[@class="recipe-summary__h1"]/text()').extract_first()
         i['author'] = response.xpath('//span[@class="submitter__name"]/text()').extract_first()
-        i['servings'] = int(response.xpath('//meta[@itemprop="recipeYield"]/@content').extract_first())
+        servings = response.xpath('//meta[@itemprop="recipeYield"]/@content').extract_first()
+        if (servings):
+            i['servings'] = int(servings)
+        else:
+            i['servings'] = 0
         
         columns = response.xpath('//ul[contains(@id, "lst_ingredients")]')
         ingredients_all = []
